@@ -10,7 +10,7 @@ import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 @Component
 public class WebSocketHandler extends AbstractWebSocketHandler {
 
-    private Array<WebSocketSession> sessions = new Array<>();
+    private final Array<WebSocketSession> sessions = new Array<>();
 
     private ConnectListener connectListener;
     private DisconnectListener disConnectListener;
@@ -18,18 +18,22 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        sessions.add(session);
+        synchronized (sessions) {
+            sessions.add(session);
+        }
         connectListener.handle(session);
     }
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        messageListener.handle(session,message.getPayload());
+        messageListener.handle(session, message.getPayload());
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        sessions.removeValue(session,true);
+        synchronized (sessions) {
+            sessions.removeValue(session, true);
+        }
         disConnectListener.handle(session);
     }
 

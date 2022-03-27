@@ -11,6 +11,7 @@ public class Panzer {
 
     private final Vector2 position = new Vector2();
     private final Vector2 angle = new Vector2();
+    private final Vector2 origin = new Vector2();
 
     private final Texture texture;
     private final TextureRegion textureRegion;
@@ -27,6 +28,7 @@ public class Panzer {
         texture = new Texture(textureName);
         textureRegion = new TextureRegion(texture);
         position.set(x, y);
+        origin.set(position).add(halfSize,halfSize);
     }
 
     public void render(Batch batch) {
@@ -49,11 +51,16 @@ public class Panzer {
         texture.dispose();
     }
 
-    public void mocveTo(Vector2 direction) {
+    public void moveTo(Vector2 direction) {
         position.add(direction);
+        origin.set(position).add(halfSize,halfSize);
     }
 
     public void rotateTo(Vector2 mousePosition) {
-        angle.set(mousePosition).sub(position.x + halfSize, position.y + halfSize);
+        angle.set(mousePosition).sub(origin);
+    }
+
+    public Vector2 getOrigin() {
+        return origin;
     }
 }

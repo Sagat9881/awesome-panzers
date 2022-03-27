@@ -5,19 +5,23 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.ScreenUtils;
-import org.graalvm.compiler.loop.MathUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Starter extends ApplicationAdapter {
 
-    private KeyBoardAdapter inputProcessor = new KeyBoardAdapter();
+    private final KeyBoardAdapter inputProcessor;
     private List<Panzer> enemyList = new ArrayList<>();
     private SpriteBatch batch;
     private Panzer me;
+    private MessageSender sender;
+    public Starter(InputState inputState) {
+        this.inputProcessor = new KeyBoardAdapter(inputState);
+    }
 
     @Override
     public void create() {
@@ -36,7 +40,7 @@ public class Starter extends ApplicationAdapter {
 
     @Override
     public void render() {
-        me.mocveTo(inputProcessor.getDirection());
+        me.moveTo(inputProcessor.getDirection());
         me.rotateTo(inputProcessor.getMousePosition());
         ScreenUtils.clear(1, 0, 0, 1);
         batch.begin();
@@ -52,5 +56,16 @@ public class Starter extends ApplicationAdapter {
     public void dispose() {
         batch.dispose();
         me.dispose();
+    }
+
+    public void setSender(MessageSender sender) {
+        this.sender = sender;
+    }
+
+    public void handleTimer() {
+        if(Objects.nonNull(inputProcessor)){
+            InputState playerState = inputProcessor.updateAndGetInputState(me.getOrigin());
+            sender.sendMessage(playerState);
+        }
     }
 }
