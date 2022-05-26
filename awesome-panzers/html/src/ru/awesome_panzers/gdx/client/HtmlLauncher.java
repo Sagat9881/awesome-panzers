@@ -12,6 +12,7 @@ import ru.awesome_panzers.gdx.dto.InputStateImpl;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class HtmlLauncher extends GwtApplication {
+    private MessageProcessor messageProcessor;
 
     @Override
     public GwtApplicationConfiguration getConfig() {
@@ -44,8 +45,9 @@ public class HtmlLauncher extends GwtApplication {
     @Override
     public ApplicationListener createApplicationListener() {
         WebSocket client = getWebSocket("ws://localhost:8888/ws");
-        AtomicBoolean once = new AtomicBoolean();
+
         Starter starter = new Starter(new InputStateImpl());
+        messageProcessor = new MessageProcessor(starter);
         starter.setSender(message->{
             client.send(toJson(message));
         });
@@ -57,16 +59,16 @@ public class HtmlLauncher extends GwtApplication {
                 starter.handleTimer();
             }
         };
-        timer.scheduleRepeating(1000/30);
+
 
         EventListenerCallback eventListenerCallback = event -> {
-            if(!once.get()){
-                client.send("hello");
-                once.set(true);
-            }
-            log(event.getData());
+            messageProcessor.processEvent(event);
         };
-        client.addEventListener("open", eventListenerCallback);
+
+        client.addEventListener("open", event->{
+            timer.scheduleRepeating(1000/30);
+            messageProcessor.processEvent(event);
+        });
         client.addEventListener("close", eventListenerCallback);
         client.addEventListener("error", eventListenerCallback);
         client.addEventListener("message", eventListenerCallback);

@@ -81,4 +81,7 @@ public class KeyBoardAdapter extends InputAdapter {
 
     }
 
+    public InputState getInputState() {
+        return inputState;
+    }
 }

@@ -4,17 +4,20 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import ru.awesome_panzers.gdx.emitter.Emitter;
 
 public class Panzer {
     private final float size = 64;
     private final float halfSize = size / 2;
 
     private final Vector2 position = new Vector2();
-    private final Vector2 angle = new Vector2();
+    private final Vector2 angle = new Vector2(1,1);
     private final Vector2 origin = new Vector2();
 
     private final Texture texture;
     private final TextureRegion textureRegion;
+
+    public Emitter emitter = new Emitter();
 
     public Vector2 getPosition() {
         return position;
@@ -62,5 +65,14 @@ public class Panzer {
 
     public Vector2 getOrigin() {
         return origin;
+    }
+
+    public void moveTo(float x, float y) {
+        position.set(x,y);
+        origin.set(position).add(halfSize,halfSize);
+    }
+
+    public void rotateTo(float angle) {
+        this.angle.setAngleDeg(angle);
     }
 }

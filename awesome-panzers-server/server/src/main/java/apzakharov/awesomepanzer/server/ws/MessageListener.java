@@ -1,7 +1,8 @@
 package apzakharov.awesomepanzer.server.ws;
 
-import org.springframework.web.socket.WebSocketSession;
+import com.fasterxml.jackson.databind.JsonNode;
+import org.springframework.web.socket.adapter.standard.StandardWebSocketSession;
 
 public interface MessageListener {
-    void handle(WebSocketSession session, String message);
+    void handle(StandardWebSocketSession session, JsonNode message);
 }
